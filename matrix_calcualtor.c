@@ -12,6 +12,7 @@
  * TODO LIST
  * add matrix of compatibility charts for iterate_months
  * add pythagoras matrix, to add name and birth numbers together to find missing numbers
+ * fix bug in calc years (if it is a bug) 
  * 
 */
 
@@ -24,7 +25,7 @@
  hard coded macro to define the alphabet system used. 
  0 is hebrew, does not use 9. 
  1 is normal english gematria.
- 2 is the hebrew and english system reduced together, interestinly the diffrence is 9 ;) 
+ 2 is the hebrew and english system reduced together, interestingly the diffrence is 9 ;) 
 */
 #define system 1
 
@@ -109,7 +110,6 @@ int calc_word(char* input_string, int *vowel_total, int *consonant_total) {
         //printf("letter.%c = %d type.%d\n", input_string[len], j, bvowel);
         len++;
     }
-    //printf("vowel_total.%d conesneant_total.%d, word_total.%d\n", *vowel_total, *consonant_total, y);
     return(y);
 }
 
@@ -266,8 +266,8 @@ void calc_personal_years (int day_of_birth_number, int month_of_birth, int year_
 
 int main() {
     // inputs to calculate
-    char name[] = "Ella Bullock";
-    char bday[] = "6/11/2014"; 
+    char name[] = "Adam Bullock";
+    char bday[] = "28/6/1988"; 
     int  max_age_gap = 4;
     
     // needed variables
@@ -296,9 +296,10 @@ int main() {
     
     // find and print personal year, 4 month periods, months and days. 
     printf("Personal Year, thirds of year, month and day calcualtions:\n");
+    // possible bug here, as month number needs to be unreduced for the months, 10, 11, 12. Needs further testing and a fix. 
     calc_personal_years (day_of_birth_number, month_number, unreduced_year_number, date_of_birth_number, reduced_vowel, reduced_total, 2088);
     
-    // find compatible business or personal matches based on date of birth only. 
+    // find compatible business or personal matches based on date of birth only. You need a chart to determine what number to seek for until I add it to be done automatically. 
     printf("\nCompatible dates of birth for business or personal relationships:\n");
     find_compatible_matches(unreduced_year_number, max_age_gap, 9);
     return(0);
