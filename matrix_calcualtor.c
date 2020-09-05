@@ -253,18 +253,18 @@ void calc_date_of_birth_number(struct sbday *bday) {
 int moon_phase(int year, int month, int day) {
     // approximation of moon phase, seems accurate within 1-2 days for the year 2020.
     // need to check other years. 
-	int r = year % 100;
-	r %= 19;
-	if (r>9){ r -= 19;}
-	r = ((r * 11) % 30) + month + day;
-	if ( month != 1 && month < 3 ) {
+    int r = year % 100;
+    r %= 19;
+    if (r>9){ r -= 19;}
+    r = ((r * 11) % 30) + month + day;
+    if ( month != 1 && month < 3 ) {
         r += 2;
     } else { 
         r += 1;
     }
-	r -= ((year<2000) ? 4 : 8.3); // small rounding error here due to integer math... 
-	r = r % 30;
-	return ((r < 0) ? r+30 : r);
+    r -= ((year<2000) ? 4 : 8.3); // small rounding error here due to integer math... 
+    r = r % 30;
+    return ((r < 0) ? r+30 : r);
 }
 
 void calc_personal_years (int day_of_birth_number, int month_of_birth, int year_of_birth, int dob_number, int vowel_number, int name_number, int ending_year) {
