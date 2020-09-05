@@ -329,9 +329,7 @@ int main() {
     // inputs to calculate
     char strname[] = "Adam Bullock";
     char strbday[] = "28/6/1988";
-    //char straddress[] = "1 Crab Creek Road Broome Western Australia";
-    //char straddress[] = "132 Almond Avenue Bakers Hill Western Australia";
-    char straddress[] = "40 Hubert Street East Victoria Park Western Autralia";
+    char straddress[] = "1 Crab Creek Road Broome Western Australia";
     int  max_age_gap = 4;
     
     // structures for name and birthday, set all variables to 0.
