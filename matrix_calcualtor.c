@@ -200,18 +200,18 @@ void calc_sentance(struct ssentance *sentance) {
             sentance->total_vowel_number += vowel_number;
             sentance->total_consonant_number += consonant_number;
             // reduce each word total and print the result for this word. 
-            int ireduced_vowel = reduce_number(vowel_number, SPECIAL_NUMBER);
-            int ireduced_consonant = reduce_number(consonant_number, SPECIAL_NUMBER);
-            int ireduced_total = reduce_number(whole_number, SPECIAL_NUMBER);
+            int ireduced_vowel = reduce_to_single_number(vowel_number, SPECIAL_NUMBER);
+            int ireduced_consonant = reduce_to_single_number(consonant_number, SPECIAL_NUMBER);
+            int ireduced_total = reduce_to_single_number(whole_number, SPECIAL_NUMBER);
             printf("%s = vowel.%d/%d consonant.%d/%d total.%d/%d\n", word, vowel_number, ireduced_vowel, consonant_number, ireduced_consonant, whole_number, ireduced_total);
             // move onto the next word. 
             ptr = strtok(NULL, delim);
         } while ( ptr != NULL) ; // stop when there are no words left.
     }
     // reduce the total numbers to single digits and return the results. 
-    sentance->reduced_total = reduce_number(sentance->total_whole_number,SPECIAL_NUMBER);
-    sentance->reduced_vowel = reduce_number(sentance->total_vowel_number,SPECIAL_NUMBER);
-    sentance->reduced_consonant = reduce_number(sentance->total_consonant_number,SPECIAL_NUMBER);
+    sentance->reduced_total = reduce_to_single_number(sentance->total_whole_number,SPECIAL_NUMBER);
+    sentance->reduced_vowel = reduce_to_single_number(sentance->total_vowel_number,SPECIAL_NUMBER);
+    sentance->reduced_consonant = reduce_to_single_number(sentance->total_consonant_number,SPECIAL_NUMBER);
 }
 
 void calc_date_of_birth_number(struct sbday *bday) {
@@ -248,6 +248,23 @@ void calc_date_of_birth_number(struct sbday *bday) {
             } else printf("null ptr\n");
         } else printf("null ptr\n");
     } else printf("null ptr\n");
+}
+
+int moon_phase(int year, int month, int day) {
+    // approximation of moon phase, seems accurate within 1-2 days for the year 2020.
+    // need to check other years. 
+	int r = year % 100;
+	r %= 19;
+	if (r>9){ r -= 19;}
+	r = ((r * 11) % 30) + month + day;
+	if ( month != 1 && month < 3 ) {
+        r += 2;
+    } else { 
+        r += 1;
+    }
+	r -= ((year<2000) ? 4 : 8.3); // small rounding error here due to integer math... 
+	r = r % 30;
+	return ((r < 0) ? r+30 : r);
 }
 
 void calc_personal_years (int day_of_birth_number, int month_of_birth, int year_of_birth, int dob_number, int vowel_number, int name_number, int ending_year) {
@@ -294,7 +311,13 @@ void calc_personal_years (int day_of_birth_number, int month_of_birth, int year_
                 sprintf(snumber, "%d%d%d", z+1, y+1, i);
                 int day_number = calc_word(snumber, &dummy_vowel, &dummy_consonant);
                 int actual_day_number = reduce_to_single_number(day_number+middle_number,IGNORE_SPECIAL_NUMBER);
-                printf("            %d/%d/%d = %d + %d = %d/%d\n", z+1, y+1 ,k, day_number, middle_number, day_number+middle_number, actual_day_number);
+                int phase = moon_phase(k,y+1,z+1);
+                char moonph[4] = {0};
+                if (phase == 15)
+                    sprintf(moonph, "[F]");
+                else if (phase == 0)
+                    sprintf(moonph, "[N]");
+                printf("            %d/%d/%d = %d + %d = %d/%d %s\n", z+1, y+1 ,k, day_number, middle_number, day_number+middle_number, actual_day_number, moonph);
             }
             y = y == 11 ? -1 : y;
             if ( ++j > 11 ) break;
@@ -306,6 +329,9 @@ int main() {
     // inputs to calculate
     char strname[] = "Adam Bullock";
     char strbday[] = "28/6/1988";
+    //char straddress[] = "1 Crab Creek Road Broome Western Australia";
+    //char straddress[] = "132 Almond Avenue Bakers Hill Western Australia";
+    char straddress[] = "40 Hubert Street East Victoria Park Western Autralia";
     int  max_age_gap = 4;
     
     // structures for name and birthday, set all variables to 0.
@@ -313,9 +339,12 @@ int main() {
     memset(&bday, 0, sizeof(bday));
     struct ssentance name;
     memset(&name, 0, sizeof(name));
+    struct ssentance address;
+    memset(&address, 0, sizeof(address));
     // assign birthday string and name string to structures. 
     name.sentance = strname;
     bday.bday = strbday;
+    address.sentance = straddress;
     
     // calculate and print name 
     calc_sentance(&name);
@@ -325,9 +354,13 @@ int main() {
     calc_date_of_birth_number(&bday);
     printf("day.%d/%d/%d month.%d/%d year.%d/%d/%d\n  date_of_birth_number.%d/%d\n  first important year.%d\n  second important year.%d\n\n", bday.day_of_birth, bday.reduced_day_of_birth,bday.final_day_of_birth,  bday.month_of_birth, bday.reduced_month_of_birth, bday.year_of_birth, bday.reduced_year_of_birth, bday.final_year_of_birth, bday.date_of_birth_number, bday.reduced_date_of_birth_number, bday.first_impotant_year, bday.second_important_year);
     
+    // calcuate addrress numbers. 
+    calc_sentance(&address);
+    printf("vowel number.%d/%d\nconesnant number.%d/%d\nwhole name number.%d/%d\n\n", address.total_vowel_number, address.reduced_vowel, address.total_consonant_number, address.reduced_consonant, address.total_whole_number, address.reduced_total);
+    
     // find and print personal year, 4 month periods, months and days. 
     printf("Personal Year, thirds of year, month and day calcultions:\n");
-    calc_personal_years (bday.final_day_of_birth, bday.month_of_birth, bday.year_of_birth, bday.reduced_date_of_birth_number, name.reduced_vowel, name.reduced_total, 2022);
+    calc_personal_years (bday.final_day_of_birth, bday.month_of_birth, bday.year_of_birth, bday.reduced_date_of_birth_number, name.reduced_vowel, name.reduced_total, 2021);
     
     // find compatible business or personal matches based on date of birth only. You need a chart to determine what number to seek for until I add it to be done automatically. 
     printf("\nCompatible dates of birth for business or personal relationships:\n");
